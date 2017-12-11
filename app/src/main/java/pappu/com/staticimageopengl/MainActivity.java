@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pickImage = (Button)findViewById(R.id.pick_image);
         pickImage.setOnClickListener(this);
 
+
     }
 
     @Override
@@ -50,13 +51,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void viewInGlview(Bitmap bitmap){
-        imageRenderer = new ImageRenderer(this, bitmap.getWidth(), bitmap.getHeight());
+        imageRenderer = new ImageRenderer(this, 500, 500);
         glSurfaceView = new GlSurfaceView(this);
         glSurfaceView.setRenderer(imageRenderer);
-        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         parentView.addView(glSurfaceView);
+        pickImage.setVisibility(View.GONE);
         imageRenderer.setImage(bitmap);
-        glSurfaceView.requestRender();
+
+
     }
 
 
@@ -71,29 +74,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 String[] filePathColumn = { MediaStore.Images.Media.DATA };
                 imagesEncodedList = new ArrayList<String>();
-                if(data.getData()!=null){
-
-                    Uri mImageUri=data.getData();
-
-                    // Get the cursor
-                    Cursor cursor = getContentResolver().query(mImageUri,
-                            filePathColumn, null, null, null);
-                    // Move to first row
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageEncoded  = cursor.getString(columnIndex);
-                    Bitmap bitmap = null;
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mImageUri);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    viewInGlview(bitmap);
-                    Log.d("MainActivity",""+imageEncoded+"   "+bitmap.getWidth());
-                    cursor.close();
-
-                } else {
+//                if(data.getData()!=null){
+//
+//                    Uri mImageUri=data.getData();
+//
+//                    // Get the cursor
+//                    Cursor cursor = getContentResolver().query(mImageUri,
+//                            filePathColumn, null, null, null);
+//                    // Move to first row
+//                    cursor.moveToFirst();
+//
+//                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                    imageEncoded  = cursor.getString(columnIndex);
+//                    Bitmap bitmap = null;
+//                    try {
+//                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mImageUri);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    viewInGlview(bitmap);
+//                    Log.d("MainActivity",""+imageEncoded+"   "+bitmap.getWidth());
+//                    cursor.close();
+//
+//                } else {
                     if (data.getClipData() != null) {
                         ClipData mClipData = data.getClipData();
                         ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
@@ -115,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
                     }
-                }
+//                }
             } else {
                 Toast.makeText(this, "You haven't picked Image",
                         Toast.LENGTH_LONG).show();

@@ -61,7 +61,17 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
 
     void setImage(Bitmap bitmap){
         this.bitmap = bitmap;
-        Log.d("ImageRender","Second>>>");
+//        createWatermarkRenderer(bitmap);
+
+    }
+
+    void changeAlphaFactor(float alpha){
+        if(waterMarkRenderer!=null)
+        {
+            Log.d("ImageRender","Second>>>");
+            waterMarkRenderer.setAlphaFactor(alpha);
+        }
+
     }
 
     @Override
@@ -141,10 +151,18 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         renderOnBuffer();
     }
 
+    float in=(float) 0.0;
     void renderOnBuffer(){
 
-        if(waterMarkRenderer!=null)
-        waterMarkRenderer.render(1);
+        if(waterMarkRenderer!=null){
+            Log.d("ImageRender","render>>>");
+            waterMarkRenderer.render(1,in);
+            in+=(float) (1.0/1000.0)*2.0;
+            if(in>1){
+                in=1;
+            }
+        }
+
 
     }
 
@@ -153,6 +171,7 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
     public void onDrawFrame(GL10 gl10) {
 
         onScreenDraw();
+
     }
 
 

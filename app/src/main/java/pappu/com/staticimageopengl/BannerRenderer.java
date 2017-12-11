@@ -23,12 +23,13 @@ public class BannerRenderer {
 
     private int indexCount;
 
+
     private  ImageResourceRenderer imageResourceRenderer;
     private GLRenderHelper glRenderHelper;
 
 
     public BannerRenderer(Context context, Bitmap bitmap, int screenWidth, int screenHeight, float[] projecMatrix){
-        this.setBuffer(screenHeight, screenWidth);
+        this.setBuffer(screenWidth, screenHeight);
         shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.fragment_shader_withoutblend);
         uAlphaFactorLoc = GLES20.glGetUniformLocation(shaderProgram, "u_AlphaFactor");
         glRenderHelper = new GLRenderHelper(shaderProgram,projecMatrix);
@@ -40,11 +41,15 @@ public class BannerRenderer {
 
     }
 
+    public void setAlphaFactor(float alphaFactor){
+
+    }
+
     public void dispose() {
         imageResourceRenderer.dispose();
     }
 
-    public void render(int textureUnit){
+    public void render(int textureUnit,float alphaFactor){
         if (!imageResourceRenderer.ready())
             return;
 
@@ -53,7 +58,7 @@ public class BannerRenderer {
         glRenderHelper.updateTexCoordAtrrib(textureCoordinatesBuffer,2);
         glRenderHelper.updateProjectionMtrx();
         imageResourceRenderer.render(textureUnit);
-        GLES20.glUniform1f(uAlphaFactorLoc, 1);
+        GLES20.glUniform1f(uAlphaFactorLoc, alphaFactor);
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, indexCount,
                 GLES20.GL_UNSIGNED_SHORT, indexBuffer);
         glRenderHelper.disableVertexAttrib();
