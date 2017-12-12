@@ -28,7 +28,7 @@ public class BannerRenderer {
 
 
     public BannerRenderer(Context context, Bitmap bitmap, int screenWidth, int screenHeight, float[] projecMatrix){
-        this.setBuffer(screenHeight, screenWidth);
+        this.setBuffer(screenWidth, screenHeight);
         shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.fragment_shader_withoutblend);
         uAlphaFactorLoc = GLES20.glGetUniformLocation(shaderProgram, "u_AlphaFactor");
         glRenderHelper = new GLRenderHelper(shaderProgram,projecMatrix);

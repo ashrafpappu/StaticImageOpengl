@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         e.printStackTrace();
                     }
                     viewInGlview(bitmap);
+                    pickImage.setVisibility(View.GONE);
                     Log.d("MainActivity",""+imageEncoded+"   "+bitmap.getWidth());
                     cursor.close();
 
