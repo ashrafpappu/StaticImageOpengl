@@ -18,6 +18,7 @@ package pappu.com.staticimageopengl;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -191,5 +192,21 @@ public class FileUtils {
         final File OUTPUT_DIR = Environment.getExternalStorageDirectory();
         return new File(OUTPUT_DIR, "Video.mp4").toString();
     }
+    public static Bitmap createMaskBitmap(String maskName, Context mContext){
 
+        int id = mContext.getResources().getIdentifier(maskName, "raw", mContext.getPackageName());
+        InputStream istream = null;
+        istream = mContext.getResources().openRawResource(id);
+
+        Bitmap bitmap;
+        try {
+            bitmap = BitmapFactory.decodeStream(istream);
+        } finally {
+            try {
+                istream.close();
+            } catch (IOException e) {
+            }
+        }
+        return bitmap;
+    }
 }

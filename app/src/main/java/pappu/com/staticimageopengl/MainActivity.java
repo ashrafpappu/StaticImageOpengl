@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.provider.MediaStore;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pickImage = (Button)findViewById(R.id.pick_image);
         pickImage.setOnClickListener(this);
 
+
     }
 
     @Override
@@ -43,20 +45,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (view.getId()){
             case R.id.pick_image:
-                loadImageFromGallery();
+               // loadImageFromGallery();
+                Bitmap bitmap = null;
+                ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
+                for(int i = 0;i<3;i++){
+                    bitmap = FileUtils.createMaskBitmap("pappu"+i,this);
+                    Log.d("MainActivity",""+imageEncoded+"   "+bitmap.getWidth());
+                    bitmapArrayList.add(bitmap);
+                }
+
+                viewInGlview(bitmapArrayList);
+                pickImage.setVisibility(View.GONE);
                 break;
         }
 
     }
 
-    void viewInGlview(Bitmap bitmap){
-        imageRenderer = new ImageRenderer(this, bitmap.getWidth(), bitmap.getHeight());
+    void viewInGlview(ArrayList<Bitmap> bitmapArrayList){
+        imageRenderer = new ImageRenderer(this, 1280, 720);
         glSurfaceView = new GlSurfaceView(this);
         glSurfaceView.setRenderer(imageRenderer);
-        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         parentView.addView(glSurfaceView);
-        imageRenderer.setImage(bitmap);
-        glSurfaceView.requestRender();
+        pickImage.setVisibility(View.GONE);
+        imageRenderer.setImage(bitmapArrayList);
+
+
     }
 
 
@@ -89,9 +103,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    viewInGlview(bitmap);
-                    pickImage.setVisibility(View.GONE);
+                    ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
+                    bitmapArrayList.add(bitmap);
+                    bitmap = FileUtils.createMaskBitmap("pappu",this);
                     Log.d("MainActivity",""+imageEncoded+"   "+bitmap.getWidth());
+                    bitmapArrayList.add(bitmap);
+                    viewInGlview(bitmapArrayList);
+                    pickImage.setVisibility(View.GONE);
+
                     cursor.close();
 
                 } else {

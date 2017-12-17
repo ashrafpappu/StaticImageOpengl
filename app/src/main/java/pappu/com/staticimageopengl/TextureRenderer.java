@@ -2,9 +2,7 @@ package pappu.com.staticimageopengl;
 
 import android.graphics.Bitmap;
 
-/**
- * Created by nishu on 7/18/17.
- */
+
 
 public interface TextureRenderer {
     void setShaderProgram(int shaderProgram);
