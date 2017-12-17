@@ -75,16 +75,18 @@ public class ProfileImageRenderer {
         float[] vertices = new float[]{
                 left,top,0,
                 left,bottom,0,
+                right/2,bottom/2,0,
                 right,bottom,0,
                 right,top,0
 
         };
         short[] indices = new short[]{
-                0, 1, 3,1 ,3,2
+                0,1,2,1,2,3,0,2,4,2,4,3
         };
         float[] textureCoordinates = new float[]{
                 0.f, 1.f,
                 0.f, 0.f,
+                0.5f,0.5f,
                 1.f, 0.f,
                 1.f, 1.f
         };

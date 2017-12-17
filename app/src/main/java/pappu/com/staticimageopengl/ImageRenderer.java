@@ -168,19 +168,19 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
             Log.d("ImageRender","render>>>");
 
 
-//                    imageDrawList.get(seconpos).render(1,in);
-//                        in+=(float) (1.0/1000.0)*3.0;
-//                        if(in>1){
-//                            in=0;
-//                            seconpos=++seconpos%imageDrawList.size();
-//                        }
+                    imageDrawList.get(seconpos).render(1,in);
+                        in+=(float) (1.0/1000.0)*3.0;
+                        if(in>1){
+                            in=0;
+                            seconpos=++seconpos%imageDrawList.size();
+                        }
 
                     imageDrawList.get(firstpos).render(1,in1);
-//                        in1-=(float) (1.0/1000.0)*3.0;
-//                        if(in1<0){
-//                            in1=1;
-//                            firstpos=++firstpos%imageDrawList.size();
-//                        }
+                        in1-=(float) (1.0/1000.0)*3.0;
+                        if(in1<0){
+                            in1=1;
+                            firstpos=++firstpos%imageDrawList.size();
+                        }
         }
 
 
