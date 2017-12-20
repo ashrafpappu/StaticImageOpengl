@@ -5,7 +5,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 /**
- * Created by pappu on 5/9/17.
+ * Created by pappu0 on 5/9/17.
  */
 
 public class GLHelper {

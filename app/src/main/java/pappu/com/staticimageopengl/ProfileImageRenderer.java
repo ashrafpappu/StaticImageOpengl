@@ -11,7 +11,7 @@ import java.nio.ShortBuffer;
 
 
 
-public class BannerRenderer {
+public class ProfileImageRenderer {
 
     private int shaderProgram;
     private int uAlphaFactorLoc;
@@ -28,9 +28,14 @@ public class BannerRenderer {
     private GLRenderHelper glRenderHelper;
 
 
-    public BannerRenderer(Context context, Bitmap bitmap, int screenWidth, int screenHeight, float[] projecMatrix){
+    public ProfileImageRenderer(Context context, Bitmap bitmap, int screenWidth, int screenHeight, float[] projecMatrix,int pos){
         this.setBuffer(screenWidth, screenHeight);
-        shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.fragment_shader_withoutblend);
+//        if(pos==1){
+//            shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.testfragment);
+//        }else {
+            shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.fragment_shader_withoutblend);
+//        }
+
         uAlphaFactorLoc = GLES20.glGetUniformLocation(shaderProgram, "u_AlphaFactor");
         glRenderHelper = new GLRenderHelper(shaderProgram,projecMatrix);
         TextureRenderer textureRenderer = new TextureRendererNormal();
@@ -41,9 +46,6 @@ public class BannerRenderer {
 
     }
 
-    public void setAlphaFactor(float alphaFactor){
-
-    }
 
     public void dispose() {
         imageResourceRenderer.dispose();
@@ -73,16 +75,18 @@ public class BannerRenderer {
         float[] vertices = new float[]{
                 left,top,0,
                 left,bottom,0,
+                right/2,bottom/2,0,
                 right,bottom,0,
                 right,top,0
 
         };
         short[] indices = new short[]{
-                0, 1, 3,1 ,3,2
+                0,1,2,1,2,3,0,2,4,2,4,3
         };
         float[] textureCoordinates = new float[]{
                 0.f, 1.f,
                 0.f, 0.f,
+                0.5f,0.5f,
                 1.f, 0.f,
                 1.f, 1.f
         };

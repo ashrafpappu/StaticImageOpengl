@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("pappu.com.staticimageopengl", appContext.getPackageName());
+        assertEquals("pappu0.com.staticimageopengl", appContext.getPackageName());
     }
 }

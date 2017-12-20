@@ -9,6 +9,8 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 
+import java.util.ArrayList;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -26,16 +28,17 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
     int offsceenPreviewWidth, offScreenPreviewHeight;
     private static final int RECORDING_OFF = 0;
     private static String TAG = "ImageRenderer";
-    private BannerRenderer waterMarkRenderer;
+    private ArrayList<ProfileImageRenderer> imageDrawList;
 
 
     private int[] offScreenFrameBufferId = new int[1];
     private int[] offScreenTexureId = new int[1];
 
     private Context context;
+    private boolean show = false;
 
     PreviewInfo previewInfo;
-    Bitmap bitmap;
+    ArrayList<Bitmap> bitmapArrayList;
 
 
 
@@ -43,36 +46,42 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         this.context = context;
         this.offsceenPreviewWidth = (int) Math.ceil(previewWidth / 16.0) * 16;
         this.offScreenPreviewHeight = previewHeight;
+        imageDrawList = new ArrayList<>();
 
     }
 
 
-    public void clearWatermarkRendering() {
-        if (waterMarkRenderer != null) {
-            waterMarkRenderer.dispose();
-            waterMarkRenderer = null;
+    public void clearAllImageRendering() {
+        if (imageDrawList.size()>0) {
+            for(int i = 0;i<imageDrawList.size();i++){
+                imageDrawList.get(i).dispose();
+            }
+            imageDrawList.clear();
         }
     }
 
-    private void createWatermarkRenderer(Bitmap bitmap) {
-        this.clearWatermarkRendering();
-        waterMarkRenderer = new BannerRenderer(context,bitmap,previewInfo.previewWidth,previewInfo.preiviewHeight,mtrxProjectionAndView);
-    }
+    private void createWatermarkRenderer() {
+        this.clearAllImageRendering();
+        Log.d(TAG,"create>>>>>"+bitmapArrayList.size());
+        for (int j=0;j<bitmapArrayList.size();j++){
+            Log.d(TAG,"create>>>>>");
+//            if(j==0){
+//                imageDrawList.add(new ProfileImageRenderer(context,bitmapArrayList.get(j),500,previewInfo.preiviewHeight,mtrxProjectionAndView,j));
+//            }else {
+                imageDrawList.add(new ProfileImageRenderer(context,bitmapArrayList.get(j),previewInfo.previewWidth,previewInfo.preiviewHeight,mtrxProjectionAndView,j));
+           // }
 
-    void setImage(Bitmap bitmap){
-        this.bitmap = bitmap;
-//        createWatermarkRenderer(bitmap);
-
-    }
-
-    void changeAlphaFactor(float alpha){
-        if(waterMarkRenderer!=null)
-        {
-            Log.d("ImageRender","Second>>>");
-            waterMarkRenderer.setAlphaFactor(alpha);
         }
 
     }
+
+    void setImage(ArrayList<Bitmap> bitmapArrayList){
+        this.bitmapArrayList = bitmapArrayList;
+        Log.d(TAG,"create>>>>> first "+bitmapArrayList.size());
+
+    }
+
+
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
@@ -124,7 +133,7 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         Matrix.multiplyMM(mtrxProjectionAndView, 0, mtrxProjection, 0, mtrxView, 0);
 
         createOffScreenTexture();
-        createWatermarkRenderer(bitmap);
+        createWatermarkRenderer();
 
     }
 
@@ -151,16 +160,27 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         renderOnBuffer();
     }
 
-    float in=(float) 0.0;
+    float in=(float) 0.0,in1 = (float)1.0;
+    int firstpos = 0,seconpos=1;
     void renderOnBuffer(){
 
-        if(waterMarkRenderer!=null){
+        if(imageDrawList.size()>0){
             Log.d("ImageRender","render>>>");
-            waterMarkRenderer.render(1,in);
-            in+=(float) (1.0/1000.0)*2.0;
-            if(in>1){
-                in=1;
-            }
+
+
+                    imageDrawList.get(seconpos).render(1,in);
+                        in+=(float) (1.0/1000.0)*3.0;
+                        if(in>1){
+                            in=0;
+                            seconpos=++seconpos%imageDrawList.size();
+                        }
+
+                    imageDrawList.get(firstpos).render(1,in1);
+                        in1-=(float) (1.0/1000.0)*3.0;
+                        if(in1<0){
+                            in1=1;
+                            firstpos=++firstpos%imageDrawList.size();
+                        }
         }
 
 
