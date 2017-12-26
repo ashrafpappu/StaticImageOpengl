@@ -2,13 +2,16 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+
     defaultConfig {
-        applicationId "pappu0.com.staticimageopengl"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -16,6 +19,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets.main {
+        jniLibs.srcDir 'src/main/libs' //set .so files location to libs
+        jni.srcDirs = [] //Disable automatic ndk-build call
+
+    }
+
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni_source/Android.mk'
+        }
+    }
+
 }
 
 dependencies {
