@@ -5,7 +5,7 @@ LOCAL_MODULE := facedetection
 
 #LOCAL_C_INCLUDES :=  $(LOCAL_PATH)/opencv/include
 
-LOCAL_C_INCLUDES :=  /Users/hello/OpenCV-android-sdk/sdk/native/jni/include
+LOCAL_C_INCLUDES :=  /Users/hello/OpenCV-android-sdk-2/sdk/native/jni/include
 
 LOCAL_LDLIBS += -llog -ldl -lz -latomic
 LOCAL_LDFLAGS += -ljnigraphics
@@ -22,7 +22,7 @@ include $(CLEAR_VARS)
 OpenCV_INSTALL_MODULES := on
 OPENCV_CAMERA_MODULES := off
 OPENCV_LIB_TYPE := STATIC
-include  /Users/hello/OpenCV-android-sdk/sdk/native/jni/OpenCV.mk
+include  /Users/hello/OpenCV-android-sdk-2/sdk/native/jni/OpenCV.mk
 
 LOCAL_SRC_FILES = test.cpp
 

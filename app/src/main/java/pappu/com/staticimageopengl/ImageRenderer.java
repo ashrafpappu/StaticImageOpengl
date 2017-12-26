@@ -3,6 +3,7 @@ package pappu.com.staticimageopengl;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import android.graphics.drawable.GradientDrawable;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -29,7 +30,8 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
     private static final int RECORDING_OFF = 0;
     private static String TAG = "ImageRenderer";
     private ArrayList<ProfileImageRenderer> imageDrawList;
-
+    private boolean isDrawRect = false;
+    private ArrayList<long[]> rects;
 
     private int[] offScreenFrameBufferId = new int[1];
     private int[] offScreenTexureId = new int[1];
@@ -39,6 +41,8 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
 
     PreviewInfo previewInfo;
     ArrayList<Bitmap> bitmapArrayList;
+    private DrawRect drawRect =null;
+    private ArrayList<long[]> vertexPointsArray;
 
 
 
@@ -64,16 +68,30 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         this.clearAllImageRendering();
         Log.d(TAG,"create>>>>>"+bitmapArrayList.size());
         for (int j=0;j<bitmapArrayList.size();j++){
-            Log.d(TAG,"create>>>>>");
-//            if(j==0){
-//                imageDrawList.add(new ProfileImageRenderer(context,bitmapArrayList.get(j),500,previewInfo.preiviewHeight,mtrxProjectionAndView,j));
-//            }else {
-                imageDrawList.add(new ProfileImageRenderer(context,bitmapArrayList.get(j),previewInfo.previewWidth,previewInfo.preiviewHeight,mtrxProjectionAndView,j));
-           // }
+
+            imageDrawList.add(new ProfileImageRenderer(context,bitmapArrayList.get(j),previewInfo.previewWidth,previewInfo.preiviewHeight,mtrxProjectionAndView,j));
+
 
         }
+        updateVertices();
 
     }
+
+    private void updateVertices(){
+        Log.d("create","okkk>>>");
+        if(vertexPointsArray.size()>0){
+            for(int k=0;k<vertexPointsArray.size();k++){
+
+                imageDrawList.get(k).updateVertices(vertexPointsArray.get(k));
+            }
+        }
+    }
+
+    public void setVertices(ArrayList<long[]> vertexPointsArray){
+        this.vertexPointsArray = vertexPointsArray;
+    }
+
+
 
     void setImage(ArrayList<Bitmap> bitmapArrayList){
         this.bitmapArrayList = bitmapArrayList;
@@ -81,11 +99,21 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
 
     }
 
+    public void drawFaceRect(ArrayList<long[]> rect){
+        isDrawRect = true;
+        rects = new ArrayList<>();
+        for(int i=0;i<rect.size();i++){
+            rects.add(TransformationHelper.transformRectangle(rect.get(i), 1080, 1720, offsceenPreviewWidth, offScreenPreviewHeight));
+        }
+
+    }
 
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 
+        drawRect = new DrawRect(context);
+        drawRect.loadShaders();
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         GLES20.glEnable(GLES20.GL_BLEND);
@@ -181,6 +209,14 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
                             in1=1;
                             firstpos=++firstpos%imageDrawList.size();
                         }
+        }
+
+        if(isDrawRect){
+            for(int i=0;i<rects.size();i++){
+                drawRect.updateRect(rects.get(i),previewInfo.previewWidth,previewInfo.preiviewHeight);
+                drawRect.render();
+            }
+            isDrawRect = false;
         }
 
 

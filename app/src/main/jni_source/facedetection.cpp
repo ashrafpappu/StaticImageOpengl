@@ -2,7 +2,7 @@
 // Created by Pappu on 11/7/17.
 //
 
-#include "pappu_com_objectdetection_java_jni_Facedetection.h"
+#include "pappu_com_staticimageopengl_java_jni_Facedetection.h"
 
 #include <chrono>
 #include "open_cv_facedetector.h"
@@ -33,6 +33,8 @@ typedef struct _thread_data_t {
     unsigned long rowinterval;
     int index;
 } thread_data_t;
+
+Mat benchMarkMat;
 
 
 bool createNativeShapeDetector(JNIEnv *env, jobject instance, jintArray jids, jobjectArray openCvXmls) {
@@ -198,7 +200,7 @@ JNIEXPORT jintArray JNICALL Java_pappu_com_staticimageopengl_java_1jni_Facedetec
 
     auto start = std::chrono::high_resolution_clock::now();
     for(int i=0;i<openCvFaceDetectors.size();i++){
-        objectDetectionVector.push_back(openCvFaceDetectors[i]->detectFaces(imageBuf,width,height,applyHistogram));
+        objectDetectionVector.push_back(openCvFaceDetectors[i]->detectFaces(imageBuf,width,height));
         if(objectDetectionVector[i].isSuccessFull ==  true){
             LOGI("..............success............... ");
             succes = true;
@@ -223,3 +225,61 @@ JNIEXPORT jintArray JNICALL Java_pappu_com_staticimageopengl_java_1jni_Facedetec
 
     return rect;
 }
+
+JNIEXPORT jintArray JNICALL Java_pappu_com_staticimageopengl_java_1jni_Facedetection_detecttionOfGalleryImage
+        (JNIEnv *env, jobject instance, jbyteArray imageBuf_,
+         jlong imageWidth,
+         jlong imageHeight){
+    objectDetectionVector.clear();
+
+    int len = env->GetArrayLength(imageBuf_);
+    unsigned char *imageBuf = new unsigned char[len];
+    env->GetByteArrayRegion(imageBuf_, 0, len, reinterpret_cast<jbyte *>(imageBuf));
+    cv::Mat img( imageHeight, imageWidth,CV_8UC4,imageBuf,Mat::AUTO_STEP);
+    benchMarkMat.release();
+    benchMarkMat = Mat(imageHeight, imageWidth,CV_8UC1);
+    cv::cvtColor(img, benchMarkMat, COLOR_BGR2GRAY);
+#ifdef DEBUG
+//    if (imwrite("/storage/emulated/0/saved/mamun.jpg",benchMarkMat))
+//            LOGI("image is written perfectly");
+#endif
+    delete [] imageBuf;
+
+
+    long height, width;
+    height = benchMarkMat.rows;
+    width = benchMarkMat.cols;
+    //int len1 = height * width * benchMarkMat.elemSize();
+
+    bool  succes = false;
+    jint cRect[4];
+    int inc = 0;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for(int i=0;i<openCvFaceDetectors.size();i++){
+        objectDetectionVector.push_back(openCvFaceDetectors[i]->detectFaces(benchMarkMat.data,width,height));
+        if(objectDetectionVector[i].isSuccessFull ==  true){
+            LOGI("..............success............... ");
+            succes = true;
+            cRect[inc++] = objectDetectionVector[i].detecttionType;
+        }
+    }
+
+
+    if(succes == false){
+        return nullptr;
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+     LOGI("..............detect............... %lld",duration.count());
+
+
+    jintArray rect = env->NewIntArray(inc);
+    env->SetIntArrayRegion(rect, 0, inc, cRect);
+
+
+    return rect;
+
+
+}
+

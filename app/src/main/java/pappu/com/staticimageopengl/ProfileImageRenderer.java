@@ -3,6 +3,7 @@ package pappu.com.staticimageopengl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -26,9 +27,15 @@ public class ProfileImageRenderer {
 
     private  ImageResourceRenderer imageResourceRenderer;
     private GLRenderHelper glRenderHelper;
+    float[] vertices;
+
+    int screenWidth, screenHeight;
 
 
     public ProfileImageRenderer(Context context, Bitmap bitmap, int screenWidth, int screenHeight, float[] projecMatrix,int pos){
+        this.screenHeight = screenHeight;
+        this.screenWidth = screenWidth;
+
         this.setBuffer(screenWidth, screenHeight);
 //        if(pos==1){
 //            shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.testfragment);
@@ -45,6 +52,45 @@ public class ProfileImageRenderer {
 
 
     }
+
+    public void updateVertices(long[] vertexPoints){
+        float left = vertexPoints[4] ;
+        float right = screenWidth+vertexPoints[4];
+        float top = vertexPoints[5];
+        float bottom = screenHeight+vertexPoints[5];
+
+        Log.d("updateVertices","width = "+screenWidth);
+
+        vertices[0] = left;
+        vertices[1] = top;
+        vertices[2] = 0;
+        vertices[3] = left;
+        vertices[4] = bottom;
+        vertices[5] = 0;
+        vertices[6] = vertexPoints[0];
+        vertices[7] = vertexPoints[1];
+        vertices[8] = 0;
+        vertices[9] = vertexPoints[2];
+        vertices[10] = vertexPoints[3];
+        vertices[11] = 0;
+        vertices[12] = right;
+        vertices[13] = bottom;
+        vertices[14] = 0;
+        vertices[15] = right;
+        vertices[16] = top;
+        vertices[17] = 0;
+
+        updateVertexBuffer();
+    }
+
+    private void updateVertexBuffer(){
+        vertexBuffer.position(0);
+        vertexBuffer.put(vertices);
+        vertexBuffer.position(0);
+    }
+
+
+
 
 
     public void dispose() {
@@ -68,27 +114,21 @@ public class ProfileImageRenderer {
     }
 
     private  void setBuffer(int screenWidth, int screenHeight){
-        float left = 0 ;
-        float right = screenWidth;
-        float top = 0;
-        float bottom = screenHeight;
-        float[] vertices = new float[]{
-                left,top,0,
-                left,bottom,0,
-                right/2,bottom/2,0,
-                right,bottom,0,
-                right,top,0
 
-        };
+        vertices = new float[18];
+
         short[] indices = new short[]{
-                0,1,2,1,2,3,0,2,4,2,4,3
+               // 0,1,2,1,2,3,0,2,4,2,4,3
+               // 0,1,4,4,1,3
+                0,1,2,2,1,4,0,2,5,2,4,3,5,2,3,3,4,5
         };
         float[] textureCoordinates = new float[]{
-                0.f, 1.f,
-                0.f, 0.f,
-                0.5f,0.5f,
-                1.f, 0.f,
-                1.f, 1.f
+                0.0f, 1.0f,
+                0.0f, 0.f,
+                0.47f,0.5f,
+                0.67f,0.5f,
+                1.0f, 0.f,
+                1.0f, 1.0f
         };
 
         this.indexCount = indices.length;
@@ -96,8 +136,7 @@ public class ProfileImageRenderer {
         ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
         vbb.order(ByteOrder.nativeOrder());
         vertexBuffer = vbb.asFloatBuffer();
-        vertexBuffer.put(vertices);
-        vertexBuffer.position(0);
+        updateVertexBuffer();
 
 
         ByteBuffer byteBuf = ByteBuffer.allocateDirect(textureCoordinates.length * 4);

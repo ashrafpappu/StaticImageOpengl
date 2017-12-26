@@ -20,4 +20,6 @@ public class Facedetection {
     public native boolean deserialize(int[] ids, String[] openCVXMLPaths);
     public native int[] faceDetect(byte[] imageBuf, long imageWidth, long imageHeight,
                                   int orientation,int coreNumber,boolean applyHistogram);
+    public native int[] detecttionOfGalleryImage(byte[] imageBuf,
+                                                long imageWidth, long imageHeight);
 }

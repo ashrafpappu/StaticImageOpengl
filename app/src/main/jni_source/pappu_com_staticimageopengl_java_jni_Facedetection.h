@@ -39,6 +39,14 @@ JNIEXPORT jboolean JNICALL Java_pappu_com_staticimageopengl_java_1jni_Facedetect
 JNIEXPORT jintArray JNICALL Java_pappu_com_staticimageopengl_java_1jni_Facedetection_faceDetect
   (JNIEnv *, jobject, jbyteArray, jlong, jlong, jint, jint, jboolean);
 
+/*
+ * Class:     pappu_com_staticimageopengl_java_jni_Facedetection
+ * Method:    detecttionOfGalleryImage
+ * Signature: ([BJJ)V
+ */
+JNIEXPORT jintArray JNICALL Java_pappu_com_staticimageopengl_java_1jni_Facedetection_detecttionOfGalleryImage
+  (JNIEnv *, jobject, jbyteArray, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif

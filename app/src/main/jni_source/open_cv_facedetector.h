@@ -29,7 +29,7 @@ class OpenCvFaceDetector :  public TrainAbleDetector {
 public:
     OpenCvFaceDetector(int id) : detectorId{id} {};
     bool loadTrainData(std::string resourceFilePath);
-   ObjectDetectionResult detectFaces(unsigned char* imageBuf, int width, int height,bool applyHistogram);
+   ObjectDetectionResult detectFaces(unsigned char* imageBuf, int width, int height);
     ~OpenCvFaceDetector();
 private:
     vector<cv::Rect> mFaceRect;
@@ -44,7 +44,7 @@ private:
 
 
     int mAbsoluteFaceSize = 0,count = 0;
-    float mRelativeFaceSize   = 0.10f;
+    float mRelativeFaceSize   = 0.20f;
     Mat imgMat;
     float clipLimit = 0.7f;
 
@@ -80,14 +80,14 @@ std::string to_string(T value)
 
 
 
-ObjectDetectionResult OpenCvFaceDetector::detectFaces(unsigned char *imageBuf,int width, int height,bool applyHistogram) {
+ObjectDetectionResult OpenCvFaceDetector::detectFaces(unsigned char *imageBuf,int width, int height) {
 
 
 
-    Mat matIamge1( width, height,CV_8UC1,imageBuf,Mat::AUTO_STEP);
-    Mat matIamge;
-    cv::rotate(matIamge1, matIamge, ROTATE_90_CLOCKWISE);
-    matIamge1.release();
+    Mat matIamge( height, width,CV_8UC1,imageBuf,Mat::AUTO_STEP);
+//    Mat matIamge;
+//    cv::rotate(matIamge1, matIamge, ROTATE_90_CLOCKWISE);
+//    matIamge1.release();
 
 
 
@@ -96,85 +96,47 @@ ObjectDetectionResult OpenCvFaceDetector::detectFaces(unsigned char *imageBuf,in
     if (round(height1 * mRelativeFaceSize) > 0) {
             mAbsoluteFaceSize = round(height1 * mRelativeFaceSize);
         }
-//    int *anglearray ;
-//
-//    switch (detectAngleOrientation){
-//        case DetectAngleOrientation ::right:{
-//            anglearray = rightToLeftAngle;
-//            break;
-//        }
-//        case DetectAngleOrientation ::middle:{
-//            anglearray = startWithMiddleAngle;
-//            break;
-//        }
-//        case DetectAngleOrientation ::left:{
-//            anglearray = leftToRightAngle;
-//            break;
-//        }
-//    }
+
 
     Size minSize = Size(mAbsoluteFaceSize,mAbsoluteFaceSize);
+    if(detectorId==2){
+        minSize = Size(30,30);
+    }
+
     Size maxSize = Size();
 
 
-//    for(int i=0;i<3;i++) {
-//
-//        if (anglearray[i] != 0) {
-//            imgMat = rotate(matIamge, anglearray[i]);
-//        }
-//        else{
-//            imgMat = matIamge;
-//        }
-//        if(applyHistogram)
-//    matIamge = histogram(matIamge,clipLimit);
 
+//    matIamge = histogram(matIamge,clipLimit);
     cv::equalizeHist(matIamge,matIamge);
 
 
         //    auto start = std::chrono::high_resolution_clock::now();
-//    cascadeClassifier.detectMultiScale(matIamge, mFaceRect, 1.2, 6,
-//                                          0,minSize,maxSize);
 
 
-    cascadeClassifier.detectMultiScale(matIamge, mFaceRect, 1.1, 6,
-                                       0,minSize,maxSize);
+
+    cascadeClassifier.detectMultiScale(matIamge, mFaceRect, 1.2, 3,
+                                       0|CV_HAAR_SCALE_IMAGE,minSize,maxSize);
 
 
-//        auto end = std::chrono::high_resolution_clock::now();
-//    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-//    LOGI("..............detect face............... %lld",duration.count());
-//        LOGI("..............detectnumber............... %d",mFaceRect.size());
         if (mFaceRect.size()>0) {
-//            if (anglearray[i] > 0){
-//                detectAngleOrientation = DetectAngleOrientation ::right;
-//            }
-//            else if (anglearray[i] < 0){
-//                detectAngleOrientation = DetectAngleOrientation ::left;
-//            }
-//            else{
-//                detectAngleOrientation = DetectAngleOrientation ::middle;
-//            }
+
             faceDetectionResult->isSuccessFull = true;
-//            faceDetectionResult->imageRotateAngle = anglearray[i];
             faceDetectionResult->detecttionType = detectorId;
             LOGI("..............detectnumber............... %d",detectorId);
             for (cv::Rect rect : mFaceRect) {
                 facedetection::Rect rect1{rect.x,rect.y,rect.x + rect.width,rect.y + rect.height};
                 faceDetectionResult->facesRect.push_back(rect1);
             }
-
-
-
-//            break;
         }
         else{
 //            std::string str;
 //            str.append("/sdcard/saved/");
 //            str.append( to_string(count++));
 //            str.append(".jpg");
-//            imwrite(str , imgMat );
+//            imwrite(str , matIamge );
         }
-//    }
+
 
     return *faceDetectionResult;
 }
