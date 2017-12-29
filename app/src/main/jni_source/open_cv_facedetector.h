@@ -85,8 +85,18 @@ ObjectDetectionResult OpenCvFaceDetector::detectFaces(unsigned char *imageBuf,in
 
 
     Mat matIamge( height, width,CV_8UC1,imageBuf,Mat::AUTO_STEP);
-//    Mat matIamge;
-//    cv::rotate(matIamge1, matIamge, ROTATE_90_CLOCKWISE);
+   // Mat matIamge1;// = rotate(matIamge,30);
+   // cv::rotate(matIamge1, matIamge, ROTATE_90_CLOCKWISE);
+
+
+//    std::string str;
+//    str.append("/sdcard/saved/");
+//    str.append( to_string(count++));
+//    str.append(".jpg");
+//    imwrite(str , matIamge1 );
+
+
+  //  LOGI("..............rotateimage............... %d  %d",matIamge.rows,matIamge1.rows );
 //    matIamge1.release();
 
 
@@ -100,14 +110,14 @@ ObjectDetectionResult OpenCvFaceDetector::detectFaces(unsigned char *imageBuf,in
 
     Size minSize = Size(mAbsoluteFaceSize,mAbsoluteFaceSize);
     if(detectorId==2){
-        minSize = Size(30,30);
+        minSize = Size(35,35);
     }
 
     Size maxSize = Size();
 
 
 
-//    matIamge = histogram(matIamge,clipLimit);
+  //  matIamge = histogram(matIamge,clipLimit);
     cv::equalizeHist(matIamge,matIamge);
 
 

@@ -118,9 +118,9 @@ public class ProfileImageRenderer {
         vertices = new float[18];
 
         short[] indices = new short[]{
-               // 0,1,2,1,2,3,0,2,4,2,4,3
-               // 0,1,4,4,1,3
-                0,1,2,2,1,4,0,2,5,2,4,3,5,2,3,3,4,5
+
+             //  0,1,2,2,1,4,0,2,5,2,4,3,5,2,3,3,4,5
+                0,1,4,0,4,5
         };
         float[] textureCoordinates = new float[]{
                 0.0f, 1.0f,

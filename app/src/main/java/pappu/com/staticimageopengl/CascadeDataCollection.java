@@ -10,12 +10,12 @@ import java.util.List;
 public class CascadeDataCollection {
     private static int resource[] = {
            R.raw.haarcascade_frontalface_alt2,
-            R.raw.haarcascade_eye_tree_eyeglasses
+            R.raw.haarcascade_eye_tree_eyeglasses1
     };
 
     private static String xmlFileNames[] = {
             "haarcascade_frontalface_alt2.xml",
-            "haarcascade_eye_tree_eyeglasses"
+            "haarcascade_eye_tree_eyeglasses1"
 
     };
 

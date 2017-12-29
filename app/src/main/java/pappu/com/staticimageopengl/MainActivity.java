@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Facedetection facedetection;
     private List<CascadeData> cascadeDataList;
     ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
+    ArrayList<long[]> eyePointsArray;
+    ArrayList<long[]> faceRect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,16 +119,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.pick_image:
                // loadImageFromGallery();
                 Bitmap bitmap = null;
-
-              for(int i = 1;i<3;i++) {
+                eyePointsArray = new ArrayList<>();
+              for(int i = 1;i<=4;i++) {
+//                  if(i==3)
+//                      continue;
                    bitmap = FileUtils.createMaskBitmap("pappu" + i, this);
-                   bitmapArrayList.add(bitmap);
-               }
+                   long[] vertices = getVerticesOfImages(bitmap);
+
+
+
+                  double angle = getRotateAngle(vertices);
+
+                  Bitmap bitmap1 = null;
+                  if(angle>0){
+                     // vertices[1] = vertices[3];
+                      bitmap1 = BitmapUtils.rotateBitmap(bitmap,(float) angle);
+                      bitmapArrayList.add(bitmap1);
+                     // vertices = null;
+                      //vertices = getVerticesOfImages(bitmap1);
+                      Log.d("angle",""+angle +"  "+vertices[0]+"  "+vertices[1]+"  "+vertices[2]+"  "+vertices[3]+"  "+bitmap.getWidth()+"  "+bitmap1.getWidth());
+                  }else {
+                      bitmapArrayList.add(bitmap);
+                  }
+                //vertices[4] = 0;
+                //vertices[5] = 0;
+                  eyePointsArray.add(vertices);
+
+
+        }
                 viewInGlview(bitmapArrayList);
+                imageRenderer.drawFaceRect(faceRect);
+
                 pickImage.setVisibility(View.GONE);
                 break;
         }
 
+
+    }
+
+
+    double getRotateAngle(long[] vertices){
+        double hypotanus = Math.sqrt((vertices[0]-vertices[2])*(vertices[0]-vertices[2])+(vertices[1]-vertices[3])*(vertices[1]-vertices[3]));
+        double adjacent = vertices[0]-vertices[2];
+        if(adjacent<0) adjacent*=-1;
+        double angle = Math.acos(adjacent/hypotanus)*(180/3.1416);
+        return angle;
     }
 
     void viewInGlview(ArrayList<Bitmap> bitmapArrayList){
@@ -136,32 +173,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         parentView.addView(glSurfaceView);
         pickImage.setVisibility(View.GONE);
+        imageRenderer.setVertices(eyePointsArray);
         imageRenderer.setImage(bitmapArrayList);
-
-        imageRenderer.setVertices(getVerticesOfImages());
-
-
-
-
+        
     }
 
 
-    ArrayList<long[]> getVerticesOfImages(){
 
-        ArrayList<long[]> eyePointsArray = new ArrayList<>();
 
-        for(int i = 0;i<bitmapArrayList.size();i++){
+    long[] getVerticesOfImages(Bitmap bitmap){
+
+        long[] eyePoints = new long[6];
 
             try {
-                byte [] imageByte = BitmapUtils.getBytesBitmap(bitmapArrayList.get(i));
-                int[] detected = facedetection.detecttionOfGalleryImage(imageByte,bitmapArrayList.get(i).getWidth(),bitmapArrayList.get(i).getHeight());
+                byte [] imageByte = BitmapUtils.getBytesBitmap(bitmap);
+                int[] detected = facedetection.detecttionOfGalleryImage(imageByte,bitmap.getWidth(),bitmap.getHeight());
                 if(detected!=null){
                     for(int j=0;j<detected.length;j++){
-                        ArrayList<long[]> faceRect = facedetection.getRectangle(detected[j]);
-                        //imageRenderer.drawFaceRect(faceRect);
+                        faceRect = facedetection.getRectangle(detected[j]);
 
                         if(detected[j]==CascadeType.FACE_DETECTION.getId()){
-                            Log.d(" detectObject  ","detected Face "+bitmapArrayList.get(i).getWidth() );
+                            Log.d(" detectObject  ","detected Face " );
                         }
                         if(detected[j]==CascadeType.EYE_DETECTION.getId()){
                             long[] lefteye = faceRect.get(0);
@@ -171,15 +203,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             int righteyex = (int)(righteye[0]+righteye[2])/2;
                             int righteyey = (int)(righteye[1]+righteye[3])/2;
 
-                            long[] eyePoints = new long[6];
-                            eyePoints[0] = lefteyex;
-                            eyePoints[1] = lefteyey;
-                            eyePoints[2] = righteyex;
-                            eyePoints[3] = righteyey;
-                            eyePoints[4] = 513-lefteyex;
-                            eyePoints[5] = lefteyey-965;
-                            eyePointsArray.add(eyePoints);
-                            Log.d(" detectObject  ","detected eye "+ lefteyex+"    "+lefteyey+"    "+righteyex+"    "+righteyey +"    "+eyePoints[4]);
+
+
+
+                            if(lefteyex>righteyex){
+                                eyePoints[0] = righteyex;
+                                eyePoints[1] = righteyey;
+                                eyePoints[2] = lefteyex;
+                                eyePoints[3] = lefteyey;
+                            }else {
+                                eyePoints[0] = lefteyex;
+                                eyePoints[1] = lefteyey;
+                                eyePoints[2] = righteyex;
+                                eyePoints[3] = righteyey;
+                            }
+
+                            eyePoints[4] = (long)(513-eyePoints[0]);
+                            eyePoints[5] = (long)(eyePoints[1]-(long)(965));
+                            Log.d(" detectObject  ","detected eye "+faceRect.size()+"    " +lefteyex+"    "+lefteyey+"    "+righteyex+"    "+righteyey +"    "+eyePoints[4]);
                         }
                     }
                 }
@@ -188,9 +229,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
 
-        }
-
-        return eyePointsArray;
+        return eyePoints;
 
 
     }
