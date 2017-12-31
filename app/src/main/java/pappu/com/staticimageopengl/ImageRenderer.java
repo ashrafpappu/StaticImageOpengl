@@ -70,18 +70,16 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         for (int j=0;j<bitmapArrayList.size();j++){
 
             imageDrawList.add(new ProfileImageRenderer(context,bitmapArrayList.get(j),previewInfo.previewWidth,previewInfo.preiviewHeight,mtrxProjectionAndView,j));
-
-
+            
         }
         updateVertices();
 
     }
 
     private void updateVertices(){
-        Log.d("create","okkk>>>");
         if(vertexPointsArray.size()>0){
             for(int k=0;k<vertexPointsArray.size();k++){
-
+               imageDrawList.get(k).resetImagePosition();
                 imageDrawList.get(k).updateVertices(vertexPointsArray.get(k));
             }
         }
@@ -95,8 +93,6 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
 
     void setImage(ArrayList<Bitmap> bitmapArrayList){
         this.bitmapArrayList = bitmapArrayList;
-        Log.d(TAG,"create>>>>> first "+bitmapArrayList.size());
-
     }
 
     public void drawFaceRect(ArrayList<long[]> rect){
@@ -145,9 +141,6 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         this.height = height;
         GLES20.glViewport(0, 0, width, height);
         previewInfo = AppUtils.getadjustedPreview(width,height, offsceenPreviewWidth, offScreenPreviewHeight);
-
-        Log.d("ImageRender","First>>>"+offsceenPreviewWidth+"  "+previewInfo.preiviewHeight);
-
         GLES20.glViewport(previewInfo.offsetX, previewInfo.offsetY, previewInfo.previewWidth, previewInfo.preiviewHeight);
 
         for (int i = 0; i < 16; i++) {
@@ -171,7 +164,7 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glViewport(previewInfo.offsetX, previewInfo.offsetY, previewInfo.previewWidth, previewInfo.preiviewHeight);
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         renderOnBuffer();
 
@@ -190,23 +183,30 @@ public class ImageRenderer implements GLSurfaceView.Renderer{
 
     float in=(float) 0.0,in1 = (float)1.0;
     int firstpos = 0,seconpos=1;
+    int count = 0;
     void renderOnBuffer(){
 
         if(imageDrawList.size()>0){
-            Log.d("ImageRender","render>>>");
 
 
+
+           // imageDrawList.get(seconpos).updateVertices(vertexPointsArray.get(seconpos));
                     imageDrawList.get(seconpos).render(1,in);
-                        in+=(float) (1.0/1000.0)*3.0;
+                        in+=(float) (1.0/1000.0)*10.0;
+
+           // Log.d("ImageRender","render>>>   "+in+"   "+count++);
+
                         if(in>1){
+                            //imageDrawList.get(seconpos).resetImagePosition();
                             in=0;
                             seconpos=++seconpos%imageDrawList.size();
                         }
 
                     imageDrawList.get(firstpos).render(1,in1);
-                        in1-=(float) (1.0/1000.0)*3.0;
+                        in1-=(float) (1.0/1000.0)*10.0;
                         if(in1<0){
                             in1=1;
+                            count = 0;
                             firstpos=++firstpos%imageDrawList.size();
                         }
         }

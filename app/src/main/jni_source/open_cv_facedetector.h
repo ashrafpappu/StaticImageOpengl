@@ -88,15 +88,6 @@ ObjectDetectionResult OpenCvFaceDetector::detectFaces(unsigned char *imageBuf,in
    // Mat matIamge1;// = rotate(matIamge,30);
    // cv::rotate(matIamge1, matIamge, ROTATE_90_CLOCKWISE);
 
-
-//    std::string str;
-//    str.append("/sdcard/saved/");
-//    str.append( to_string(count++));
-//    str.append(".jpg");
-//    imwrite(str , matIamge1 );
-
-
-  //  LOGI("..............rotateimage............... %d  %d",matIamge.rows,matIamge1.rows );
 //    matIamge1.release();
 
 

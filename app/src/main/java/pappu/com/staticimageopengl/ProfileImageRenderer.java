@@ -37,11 +37,8 @@ public class ProfileImageRenderer {
         this.screenWidth = screenWidth;
 
         this.setBuffer(screenWidth, screenHeight);
-//        if(pos==1){
-//            shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.testfragment);
-//        }else {
-            shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.fragment_shader_withoutblend);
-//        }
+
+        shaderProgram = GLHelper.getShaderProgramm(context, R.raw.watermarkvertex_shader, R.raw.fragment_shader_withoutblend);
 
         uAlphaFactorLoc = GLES20.glGetUniformLocation(shaderProgram, "u_AlphaFactor");
         glRenderHelper = new GLRenderHelper(shaderProgram,projecMatrix);
@@ -53,13 +50,37 @@ public class ProfileImageRenderer {
 
     }
 
-    public void updateVertices(long[] vertexPoints){
-        float left = vertexPoints[4] ;
-        float right = screenWidth+vertexPoints[4];
-        float top = vertexPoints[5];
-        float bottom = screenHeight+vertexPoints[5];
+    float left, right,top ,bottom ;
 
-        Log.d("updateVertices","width = "+screenWidth);
+    public void resetImagePosition(){
+         left =0 ;
+         right = screenWidth;
+         top = 0;
+         bottom = screenHeight;
+    }
+
+
+
+    public void updateVertices(long[] vertexPoints){
+
+
+
+        float changeOfX=(float)vertexPoints[4]/500,changeOfY=(float)vertexPoints[5]/500;
+
+
+//         left += changeOfX ;
+//         right += changeOfX;
+//         top += changeOfY;
+//         bottom += changeOfY;
+
+
+        left += vertexPoints[4] ;
+        right += vertexPoints[4];
+        top += vertexPoints[5];
+        bottom += vertexPoints[5];
+
+
+       // Log.d("vertices",""+changeOfX+"     "+changeOfY+"    "+left+"    "+right+"    "+top+"   "+bottom);
 
         vertices[0] = left;
         vertices[1] = top;

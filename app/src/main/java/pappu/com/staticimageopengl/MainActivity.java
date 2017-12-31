@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             File cascadeDir = this.getFilesDir();
 
 
-            Log.d(" desirealize  ",""  + cascadeDataList.size());
             for (int i = 0; i < cascadeDataList.size(); i++) {
                 CascadeData cascadeData = cascadeDataList.get(i);
                 File cascadeFile = new File(cascadeDir, cascadeData.getCascadeFileName());
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                // loadImageFromGallery();
                 Bitmap bitmap = null;
                 eyePointsArray = new ArrayList<>();
-              for(int i = 1;i<=4;i++) {
+              for(int i = 1;i<=6;i++) {
 //                  if(i==3)
 //                      continue;
                    bitmap = FileUtils.createMaskBitmap("pappu" + i, this);
@@ -132,23 +131,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                   Bitmap bitmap1 = null;
                   if(angle>0){
-                     // vertices[1] = vertices[3];
                       bitmap1 = BitmapUtils.rotateBitmap(bitmap,(float) angle);
                       bitmapArrayList.add(bitmap1);
-                     // vertices = null;
-                      //vertices = getVerticesOfImages(bitmap1);
                       Log.d("angle",""+angle +"  "+vertices[0]+"  "+vertices[1]+"  "+vertices[2]+"  "+vertices[3]+"  "+bitmap.getWidth()+"  "+bitmap1.getWidth());
                   }else {
                       bitmapArrayList.add(bitmap);
                   }
-                //vertices[4] = 0;
-                //vertices[5] = 0;
+
                   eyePointsArray.add(vertices);
 
 
         }
                 viewInGlview(bitmapArrayList);
-                imageRenderer.drawFaceRect(faceRect);
+               // imageRenderer.drawFaceRect(faceRect);
 
                 pickImage.setVisibility(View.GONE);
                 break;
@@ -203,9 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             int righteyex = (int)(righteye[0]+righteye[2])/2;
                             int righteyey = (int)(righteye[1]+righteye[3])/2;
 
-
-
-
+                            
                             if(lefteyex>righteyex){
                                 eyePoints[0] = righteyex;
                                 eyePoints[1] = righteyey;
@@ -236,89 +229,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-//        try {
-            // When an Image is picked
-            if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
-                    && null != data) {
-                // Get the Image from data
-
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                imagesEncodedList = new ArrayList<String>();
-                if(data.getData()!=null){
-
-                    Uri mImageUri=data.getData();
-
-                    // Get the cursor
-                    Cursor cursor = getContentResolver().query(mImageUri,
-                            filePathColumn, null, null, null);
-                    // Move to first row
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageEncoded  = cursor.getString(columnIndex);
-                    Bitmap bitmap = null;
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mImageUri);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
-                    bitmapArrayList.add(bitmap);
-                    bitmap = FileUtils.createMaskBitmap("pappu",this);
-                    Log.d("MainActivity",""+imageEncoded+"   "+bitmap.getWidth());
-                    bitmapArrayList.add(bitmap);
-                    viewInGlview(bitmapArrayList);
-                    pickImage.setVisibility(View.GONE);
-
-                    cursor.close();
-
-                } else {
-                    if (data.getClipData() != null) {
-                        ClipData mClipData = data.getClipData();
-                        ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
-                        for (int i = 0; i < mClipData.getItemCount(); i++) {
-
-                            ClipData.Item item = mClipData.getItemAt(i);
-                            Uri uri = item.getUri();
-                            mArrayUri.add(uri);
-                            // Get the cursor
-                            Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
-                            // Move to first row
-                            cursor.moveToFirst();
-
-                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                            imageEncoded  = cursor.getString(columnIndex);
-                            imagesEncodedList.add(imageEncoded);
-                            cursor.close();
-
-                        }
-                        Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
-                    }
-                }
-            } else {
-                Toast.makeText(this, "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
-            }
-//        } catch (Exception e) {
-//            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-//                    .show();
-//        }
 
 
 
-        super.onActivityResult(requestCode, resultCode, data);
-
-    }
-
-    void loadImageFromGallery(){
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
-    }
 
 }
